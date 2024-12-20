@@ -7,12 +7,13 @@
     "build": "encore production --progress"
   },
   "devDependencies": {
-    "@popperjs/core": "^2.11.6",
-    "@symfony/webpack-encore": "^4.0.0",
-    "bootstrap": "^5.2.1",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@popperjs/core": "^2.11.8",
+    "@symfony/webpack-encore": "^5.0.1",
+    "bootstrap": "^5.3.3",
     "file-loader": "^6.2.0",
-    "sass": "^1.54.9",
-    "sass-loader": "^13.0.2",
+    "sass": "^1.81.0",
+    "sass-loader": "^16.0.3",
     "webpack-notifier": "^1.15.0"
   }
 }
