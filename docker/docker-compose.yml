@@ -25,9 +25,10 @@ services:
       - ./nginx:/etc/nginx/conf.d
   db:
     container_name: expennies-db
-    image: mysql:8.0
+    image: mysql:latest
     volumes:
       - ./storage/mysql:/var/lib/mysql
+      - ./mysql:/etc/mysql/conf.d
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root

@@ -24,6 +24,9 @@ return [
             'dbname'   => $_ENV['DB_NAME'],
             'user'     => $_ENV['DB_USER'],
             'password' => $_ENV['DB_PASS'],
+            // 'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
+            // 'charset' => 'utf8mb4',
+            // 'collation' => 'utf8mb4_unicode_ci',
         ],
     ],
 ];
