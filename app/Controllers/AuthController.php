@@ -5,10 +5,12 @@ declare(strict_types = 1);
 namespace App\Controllers;
 
 use App\Entity\User;
+use App\Exception\ValidationException;
 use Doctrine\ORM\EntityManager;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
+use Valitron\Validator;
 
 class AuthController
 {
@@ -32,6 +34,23 @@ class AuthController
     public function register(Request $request, Response $response) :Response
     {
         $data = $request->getParsedBody();
+
+        $validator  = new Validator($data);
+        $validator->rule('required', ['name', 'email', 'password', 'confirmPassword']);
+        $validator->rule('email', 'email');
+        $validator->rule('equals', 'confirmPassword', 'password')->label('confirm password');
+        $validator->rule(
+            fn($field, $value, $params, $fields) => ! $this->entityManager->getRepository(User::class)->count(
+                ['email' => $value]
+            ),
+            'email'
+        )->message('user already exists');
+        if($validator->validate()) {
+            echo 'All good';
+        }else {
+            throw new ValidationException($validator->errors());
+        }
+        exit;
         $user = new User();
 
         $user->setName($data['name']);
