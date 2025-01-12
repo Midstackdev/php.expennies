@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use App\Contracts\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -18,7 +19,7 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[Entity, Table('users'), HasLifecycleCallbacks]
-class User
+class User implements UserInterface
 {
     #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
     private int $id;
@@ -50,7 +51,7 @@ class User
         $this->transactions = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -87,7 +88,7 @@ class User
         return $this;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
