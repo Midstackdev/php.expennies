@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\DataObjects\RegisterUserData;
 use App\Entity\User;
 use App\Exception\ValidationException;
 use Doctrine\ORM\EntityManager;
@@ -47,22 +48,15 @@ class AuthController
             ),
             'email'
         )->message('user already exists');
-        if($validator->validate()) {
-            echo 'All good';
-        }else {
+        if(!$validator->validate()) {
             throw new ValidationException($validator->errors());
         }
-        exit;
-        $user = new User();
 
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
-        $user->setPassword(password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]));
-        // var_dump($user);
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $this->auth->register(
+            new RegisterUserData($data['name'], $data['email'], $data['password'])
+        );
 
-        return $response;
+        return $response->withHeader('Location', '/')->withStatus(302);
     }
 
     public function login(Request $request, Response $response) :Response
