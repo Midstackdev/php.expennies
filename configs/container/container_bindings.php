@@ -5,11 +5,13 @@ declare(strict_types = 1);
 use App\Auth;
 use App\Config;
 use App\Contracts\AuthInterface;
+use App\Contracts\RequestValidatorFactoryInterface;
 use App\Contracts\SessionInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\DataObjects\SessionConfig;
 use App\Enum\AppEnvironment;
 use App\Enum\SameSite;
+use App\Requests\RequestValidatorFactory;
 use App\Services\UserProviderService;
 use App\Session;
 use Doctrine\DBAL\DriverManager;
@@ -96,5 +98,8 @@ return [
             $config->get('session.httponly', true),
             SameSite::from($config->get('session.samesite', 'lax')),
         )
+    ),
+    RequestValidatorFactoryInterface::class => fn(ContainerInterface $container) => $container->get(
+        RequestValidatorFactory::class
     ),
 ];

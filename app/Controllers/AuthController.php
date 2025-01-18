@@ -5,21 +5,21 @@ declare(strict_types = 1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\Contracts\RequestValidatorFactoryInterface;
 use App\DataObjects\RegisterUserData;
-use App\Entity\User;
 use App\Exception\ValidationException;
-use Doctrine\ORM\EntityManager;
+use App\Requests\LoginUserRequest;
+use App\Requests\RegisterUserRequest;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
-use Valitron\Validator;
 
 class AuthController
 {
     public function __construct(
         private readonly Twig $twig,
-        private readonly EntityManager $entityManager,
         private readonly AuthInterface $auth,
+        private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
     )
     {
     }
@@ -36,21 +36,7 @@ class AuthController
 
     public function register(Request $request, Response $response) :Response
     {
-        $data = $request->getParsedBody();
-
-        $validator  = new Validator($data);
-        $validator->rule('required', ['name', 'email', 'password', 'confirmPassword']);
-        $validator->rule('email', 'email');
-        $validator->rule('equals', 'confirmPassword', 'password')->label('Confirm password');
-        $validator->rule(
-            fn($field, $value, $params, $fields) => ! $this->entityManager->getRepository(User::class)->count(
-                ['email' => $value]
-            ),
-            'email'
-        )->message('user already exists');
-        if(!$validator->validate()) {
-            throw new ValidationException($validator->errors());
-        }
+        $data = $this->requestValidatorFactory->make(RegisterUserRequest::class)->validate($request->getParsedBody());
 
         $this->auth->register(
             new RegisterUserData($data['name'], $data['email'], $data['password'])
@@ -61,11 +47,7 @@ class AuthController
 
     public function login(Request $request, Response $response) :Response
     {
-        $data = $request->getParsedBody();
-
-        $validator  = new Validator($data);
-        $validator->rule('required', ['email', 'password']);
-        $validator->rule('email', 'email');
+        $data = $this->requestValidatorFactory->make(LoginUserRequest::class)->validate($request->getParsedBody());
 
         if(! $this->auth->attempt($data)) {
             throw new ValidationException(['password' => ['You entered an invalid username or password']]);

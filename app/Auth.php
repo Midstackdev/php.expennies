@@ -44,9 +44,9 @@ class Auth implements AuthInterface
 
     public function attempt(array $credentials) :bool
     {
-        $user = $this->userProvider->getByCredentials(['email' => $credentials['email']]);
+        $user = $this->userProvider->getByCredentials($credentials);
 
-        if(!$user || $this->checkCredentials($user, $credentials)) {
+        if(!$user || ! $this->checkCredentials($user, $credentials)) {
             return false;
         }
 
