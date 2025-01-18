@@ -24,7 +24,12 @@ class StartSessionMiddleware implements MiddlewareInterface
         $this->session->start();
 
         $response = $handler->handle($request);
-        session_write_close();
+
+        if($request->getMethod() === 'GET') {
+            $this->session->put('previousUrl', (string) $request->getUri());
+        }
+
+        $this->session->save();
 
         return $response;
 

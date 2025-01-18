@@ -44,7 +44,7 @@ class Session implements SessionInterface
 
     public function save(): void
     {
-
+        session_write_close();
     }
 
     public function isActive(): bool
@@ -57,7 +57,7 @@ class Session implements SessionInterface
         return $this->has($key) ? $_SESSION[$key] : $default;
     }
 
-    public function has(string $key)
+    public function has(string $key): bool
     {
         return array_key_exists($key, $_SESSION);
     }
@@ -75,6 +75,20 @@ class Session implements SessionInterface
     public function regenerate(): bool
     {
         return session_regenerate_id();
+    }
+
+    public function flash(string $key, array $messages) : void
+    {
+        $_SESSION[$this->options->flashName][$key] = $messages;
+    }
+
+    public function getFlash(string $key) : array
+    {
+        $messages = $_SESSION[$this->options->flashName][$key] ?? [];
+
+        unset($_SESSION[$this->options->flashName][$key]);
+
+        return $messages;
     }
 
 }
