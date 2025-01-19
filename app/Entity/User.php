@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Contracts\UserInterface;
+use App\Entity\Traits\HasTimestamps;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
@@ -13,14 +14,13 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 #[Entity, Table('users'), HasLifecycleCallbacks]
 class User implements UserInterface
 {
+    use HasTimestamps;
+
     #[Id, Column(options: ['unsigned' => true]), GeneratedValue]
     private int $id;
 
@@ -32,12 +32,6 @@ class User implements UserInterface
 
     #[Column]
     private string $password;
-
-    #[Column(name: 'created_at')]
-    private \DateTime $createdAt;
-
-    #[Column(name: 'updated_at')]
-    private \DateTime $updatedAt;
 
     #[OneToMany(mappedBy: 'users', targetEntity: Category::class)]
     private Collection $categories;
@@ -54,16 +48,6 @@ class User implements UserInterface
     public function getId(): int
     {
         return $this->id;
-    }
-
-    #[PrePersist, PreUpdate]
-    public function updateTimestamps(LifecycleEventArgs $args) :void
-    {
-        if(! isset($this->createdAt)) {
-            $this->createdAt = new \DateTime();
-        }
-
-        $this->updatedAt = new \DateTime();
     }
 
     public function getEmail()
@@ -96,28 +80,6 @@ class User implements UserInterface
     public function setPassword(string $password)
     {
         $this->password = $password;
-        return $this;
-    }
-
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTime $createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTime $updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
         return $this;
     }
 
