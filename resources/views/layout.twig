@@ -31,10 +31,11 @@
                         <a href="#" class="nav-link fw-bold fs-5" aria-current="page">Transactions</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link fw-bold fs-5" aria-current="page">Categories</a>
+                        <a href="/categories" class="nav-link fw-bold fs-5" aria-current="page">Categories</a>
                     </li>
                     <li>
                         <form action="/logout" class="nav-link fw-bold fs-5" method="post">
+                            {{ csrf.fields | raw }}
                             <button class="dropdown-item" href="#">Log Out</button>
                         </form>
                     </li>
