@@ -31,4 +31,9 @@ class RequestService
         return $referer;
     }
 
+    public function wantsJson(Request $request): bool
+    {
+        return $request->getHeaderLine('X-Requested-With') === 'XMLHttpRequest';
+    }
+
 }

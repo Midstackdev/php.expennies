@@ -17,12 +17,9 @@ class CategoryService
     public function create(string $name, User $user): Category
     {
         $category = new Category();
-        $category->setName($name);
         $category->setUser($user);
-        $this->entityManager->persist($category);
-        $this->entityManager->flush();
 
-        return $category;
+        return $this->update($category, $name);
     }
 
     public function getAll(): array
@@ -32,7 +29,7 @@ class CategoryService
 
     public function delete(int $id): void
     {
-        $category = $this->entityManager->find(Category::class, $id);
+        $category = $this->findById($id);
         $this->entityManager->remove($category);
         $this->entityManager->flush();
     }
@@ -40,5 +37,14 @@ class CategoryService
     public function findById(int $id): ?Category
     {
         return $this->entityManager->find(Category::class, $id);
+    }
+
+    public function update(Category $category, string $name): Category
+    {
+        $category->setName($name);
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
+
+        return $category;
     }
 }

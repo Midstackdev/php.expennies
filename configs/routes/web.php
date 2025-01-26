@@ -22,11 +22,11 @@ return function (App $app) {
 
     $app->post('/logout', [AuthController::class, 'logout'])->add(AuthMiddleware::class);
 
-    $app->group('/categories', function(RouteCollectorProxy $group) {
-        $group->get('', [CategoriesController::class, 'index']);
-        $group->post('', [CategoriesController::class, 'store']);
-        $group->delete('/{id}', [CategoriesController::class, 'delete']);
-        $group->get('/{id}', [CategoriesController::class, 'get']);
-        $group->post('/{id}', [CategoriesController::class, 'update']);
+    $app->group('/categories', function(RouteCollectorProxy $category) {
+        $category->get('', [CategoriesController::class, 'index']);
+        $category->post('', [CategoriesController::class, 'store']);
+        $category->delete('/{id:[0-9]+}', [CategoriesController::class, 'delete']);
+        $category->get('/{id:[0-9]+}', [CategoriesController::class, 'get']);
+        $category->post('/{id}', [CategoriesController::class, 'update']);
     })->add(AuthMiddleware::class);
 };

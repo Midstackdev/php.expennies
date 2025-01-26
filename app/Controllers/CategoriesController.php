@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
-
 declare(strict_types = 1);
+
+namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Requests\CreateCategoryRequest;
@@ -64,14 +64,16 @@ class CategoriesController
 
     public function update(Request $request, Response $response, array $args) :Response
     {
-        $data = $this->requestValidatorFactory->make(UpdateCategoryRequest::class)->validate($request->getParsedBody());
-        $category = $this->categoryService->findById((int) $args['id']);
+        $data = $this->requestValidatorFactory->make(UpdateCategoryRequest::class)->validate(
+            $args + $request->getParsedBody()
+        );
+        $category = $this->categoryService->findById((int) $data['id']);
 
         if(! $category) {
             return $response->withStatus(404);
         }
 
-        $data = ['status' => 'ok'];
+        $this->categoryService->update($category, $data['name']);
 
         return $this->responseFormatter->asJson($response, $data);
     }

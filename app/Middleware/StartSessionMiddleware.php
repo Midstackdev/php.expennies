@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Middleware;
 
 use App\Contracts\SessionInterface;
+use App\Services\RequestService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
@@ -13,8 +14,10 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 class StartSessionMiddleware implements MiddlewareInterface
 {
 
-    public function __construct(private readonly SessionInterface $session)
-    {
+    public function __construct(
+        private readonly SessionInterface $session,
+        private readonly RequestService $requestService,
+    ){
     }
 
 
@@ -25,7 +28,7 @@ class StartSessionMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
-        if($request->getMethod() === 'GET') {
+        if($request->getMethod() === 'GET' && ! $this->requestService->wantsJson($request)) {
             $this->session->put('previousUrl', (string) $request->getUri());
         }
 
