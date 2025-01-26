@@ -26,5 +26,7 @@ return function (App $app) {
         $group->get('', [CategoriesController::class, 'index']);
         $group->post('', [CategoriesController::class, 'store']);
         $group->delete('/{id}', [CategoriesController::class, 'delete']);
+        $group->get('/{id}', [CategoriesController::class, 'get']);
+        $group->post('/{id}', [CategoriesController::class, 'update']);
     })->add(AuthMiddleware::class);
 };

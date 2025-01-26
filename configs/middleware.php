@@ -28,6 +28,7 @@ return function (App $app) {
     $app->add(OldFormDataMiddleware::class);
     $app->add(ValidationErrorsMiddleware::class);
     $app->add(StartSessionMiddleware::class);
+    $app->addBodyParsingMiddleware();
 
     // Logger
     $app->addErrorMiddleware(

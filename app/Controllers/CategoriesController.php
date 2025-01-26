@@ -1,11 +1,13 @@
 <?php
 
-declare(strict_types = 1);
-
 namespace App\Controllers;
+
+declare(strict_types = 1);
 
 use App\Contracts\RequestValidatorFactoryInterface;
 use App\Requests\CreateCategoryRequest;
+use App\Requests\UpdateCategoryRequest;
+use App\ResponseFormatter;
 use App\Services\CategoryService;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -17,6 +19,7 @@ class CategoriesController
         private readonly Twig $twig,
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService $categoryService,
+        private readonly ResponseFormatter $responseFormatter,
     )
     {
     }
@@ -43,6 +46,34 @@ class CategoriesController
     {
         $this->categoryService->delete((int) $args['id']);
         return $response->withHeader('Location', '/categories')->withStatus(302);
+    }
+
+
+    public function get(Request $request, Response $response, array $args) :Response
+    {
+        $category = $this->categoryService->findById((int) $args['id']);
+
+        if(! $category) {
+            return $response->withStatus(404);
+        }
+
+        $data = ['name' => $category->getName(), 'id' => $category->getId()];
+
+        return $this->responseFormatter->asJson($response, $data);
+    }
+
+    public function update(Request $request, Response $response, array $args) :Response
+    {
+        $data = $this->requestValidatorFactory->make(UpdateCategoryRequest::class)->validate($request->getParsedBody());
+        $category = $this->categoryService->findById((int) $args['id']);
+
+        if(! $category) {
+            return $response->withStatus(404);
+        }
+
+        $data = ['status' => 'ok'];
+
+        return $this->responseFormatter->asJson($response, $data);
     }
 
 }
