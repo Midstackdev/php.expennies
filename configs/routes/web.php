@@ -24,6 +24,7 @@ return function (App $app) {
 
     $app->group('/categories', function(RouteCollectorProxy $category) {
         $category->get('', [CategoriesController::class, 'index']);
+        $category->get('/load', [CategoriesController::class, 'load']);
         $category->post('', [CategoriesController::class, 'store']);
         $category->delete('/{id:[0-9]+}', [CategoriesController::class, 'delete']);
         $category->get('/{id:[0-9]+}', [CategoriesController::class, 'get']);

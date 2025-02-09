@@ -17,6 +17,7 @@
     "webpack-notifier": "^1.15.0"
   },
   "dependencies": {
-    "core-js": "^3.40.0"
+    "core-js": "^3.40.0",
+    "datatables.net-dt": "^2.2.2"
   }
 }

@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
+use App\DataObjects\DataTableQueryParams;
 use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CategoryService
 {
@@ -22,9 +24,23 @@ class CategoryService
         return $this->update($category, $name);
     }
 
-    public function getAll(): array
+    public function getPaginatedQuery(DataTableQueryParams $params): Paginator
     {
-        return $this->entityManager->getRepository(Category::class)->findAll();
+        $query = $this->entityManager->getRepository(Category::class)
+            ->createQueryBuilder('c')
+            ->setFirstResult($params->start)
+            ->setMaxResults($params->lenght);
+
+        $orderBy = in_array($params->orderBy, ['name', 'createdAt', 'updatedAt']) ? $params->orderBy : 'updatedAt';
+        $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
+
+        if(! empty($params->searchTerm)) {
+            $query->where('c.name LIKE :name')->setParameter('name', '%' . addcslashes($params->searchTerm, '%_') . '%');
+        }
+
+        $query->orderBy('c.' . $orderBy, $orderDir);
+
+        return new Paginator($query);
     }
 
     public function delete(int $id): void

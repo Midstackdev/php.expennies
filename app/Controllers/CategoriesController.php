@@ -5,10 +5,12 @@ declare(strict_types = 1);
 namespace App\Controllers;
 
 use App\Contracts\RequestValidatorFactoryInterface;
+use App\Entity\Category;
 use App\Requests\CreateCategoryRequest;
 use App\Requests\UpdateCategoryRequest;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
+use App\Services\RequestService;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -20,17 +22,14 @@ class CategoriesController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly CategoryService $categoryService,
         private readonly ResponseFormatter $responseFormatter,
+        private readonly RequestService $requestService,
     )
     {
     }
 
     public function index(Request $request, Response $response) :Response
     {
-        return $this->twig->render(
-            $response,
-            'categories/index.twig',
-            ['categories' => $this->categoryService->getAll()]
-        );
+        return $this->twig->render($response, 'categories/index.twig');
     }
 
     public function store(Request $request, Response $response) :Response
@@ -76,6 +75,31 @@ class CategoriesController
         $this->categoryService->update($category, $data['name']);
 
         return $this->responseFormatter->asJson($response, $data);
+    }
+
+    public function load(Request $request, Response $response) :Response
+    {
+        $params = $this->requestService->getDataTableQueryParams($request);
+
+        $categories =  $this->categoryService->getPaginatedQuery($params);
+
+        $mapper = function (Category $category) {
+            return [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+                'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+                'updatedAt' => $category->getUpdatedAt()->format('m/d/Y g:i A')
+            ];
+        };
+
+        $totalCategories = count($categories);
+
+        return $this->responseFormatter->asJson($response, [
+            'data' => array_map($mapper, (array) $categories->getIterator()),
+            'draw' => $params->draw,
+            'total' => $totalCategories,
+            'filtered' => $totalCategories,
+        ]);
     }
 
 }
