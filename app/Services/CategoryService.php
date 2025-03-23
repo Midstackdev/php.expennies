@@ -29,7 +29,7 @@ class CategoryService
         $query = $this->entityManager->getRepository(Category::class)
             ->createQueryBuilder('c')
             ->setFirstResult($params->start)
-            ->setMaxResults($params->lenght);
+            ->setMaxResults($params->length);
 
         $orderBy = in_array($params->orderBy, ['name', 'createdAt', 'updatedAt']) ? $params->orderBy : 'updatedAt';
         $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
@@ -62,5 +62,13 @@ class CategoryService
         $this->entityManager->flush();
 
         return $category;
+    }
+
+     public function getCategoryNames(): array
+    {
+        return $this->entityManager->getRepository(Category::class)->createQueryBuilder('c')
+            ->select('c.id', 'c.name')
+            ->getQuery()
+            ->getArrayResult();
     }
 }

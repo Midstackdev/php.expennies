@@ -5,6 +5,7 @@ declare(strict_types = 1);
 use App\Controllers\AuthController;
 use App\Controllers\CategoriesController;
 use App\Controllers\HomeController;
+use App\Controllers\TransactionsController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
 use Slim\App;
@@ -29,5 +30,14 @@ return function (App $app) {
         $category->delete('/{id:[0-9]+}', [CategoriesController::class, 'delete']);
         $category->get('/{id:[0-9]+}', [CategoriesController::class, 'get']);
         $category->post('/{id}', [CategoriesController::class, 'update']);
+    })->add(AuthMiddleware::class);
+
+    $app->group('/transactions', function(RouteCollectorProxy $transaction) {
+        $transaction->get('', [TransactionsController::class, 'index']);
+        $transaction->get('/load', [TransactionsController::class, 'load']);
+        $transaction->post('', [TransactionsController::class, 'store']);
+        $transaction->delete('/{id:[0-9]+}', [TransactionsController::class, 'delete']);
+        $transaction->get('/{id:[0-9]+}', [TransactionsController::class, 'get']);
+        $transaction->post('/{id}', [TransactionsController::class, 'update']);
     })->add(AuthMiddleware::class);
 };
